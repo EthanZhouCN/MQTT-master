@@ -386,7 +386,7 @@ static int MqttSample_CmdConnect(struct MqttSampleContext *ctx)
     }
     
     ctx->devid = devid;
-    int keep_alive = 1200;
+    int keep_alive = 30;
     printf("dev id:%s\n", devid );
     printf("project id:%s\n", prjid);
     printf("auth info:%s\n", auth_info);
@@ -906,7 +906,8 @@ static int MqttSample_HandleSocket(struct MqttSampleContext *ctx, uint32_t event
             }
             else {
                 ctx->sendedbytes += bytes;
-                if(ctx->sendedbytes == ctx->mqttbuf->buffered_bytes) {
+                if(ctx->sendedbytes == ctx->mqttbuf->buffered_bytes) 
+                {
                     MqttBuffer_Reset(ctx->mqttbuf);
                     ctx->sendedbytes = -1;
                 }
@@ -970,6 +971,7 @@ static int MqttSample_Init(struct MqttSampleContext *ctx)
         return -1;
     }
 
+	//设置标准输入文件描述符为非阻塞
     if(fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK) < 0) {
         printf("Failed to set the stdin to nonblock mode, errcode is %d.\n", errno);
         return -1;
