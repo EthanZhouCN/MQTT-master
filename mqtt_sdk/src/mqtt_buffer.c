@@ -38,18 +38,21 @@ void MqttBuffer_Reset(struct MqttBuffer *buf)
 struct MqttExtent *MqttBuffer_AllocExtent(struct MqttBuffer *buf, uint32_t bytes)
 {
     struct MqttExtent *ext;
+
+    //计算分配空间大小（设置对齐）
     uint32_t aligned_bytes = bytes + sizeof(struct MqttExtent);
     aligned_bytes = aligned_bytes + (MQTT_DEFAULT_ALIGNMENT -
         (aligned_bytes % MQTT_DEFAULT_ALIGNMENT)) % MQTT_DEFAULT_ALIGNMENT;
 
+	
     if(buf->available_bytes < aligned_bytes) {
         uint32_t alloc_bytes;
         char *chunk;
 
-        if(buf->alloc_count == buf->alloc_max_count) {
+        if(buf->alloc_count == buf->alloc_max_count){
             uint32_t max_count = buf->alloc_max_count * 2 + 1;
             char **tmp = (char**)malloc(max_count * sizeof(char**));
-            if(NULL == tmp) {
+            if(NULL == tmp){
                 return NULL;
             }
 
@@ -61,6 +64,7 @@ struct MqttExtent *MqttBuffer_AllocExtent(struct MqttBuffer *buf, uint32_t bytes
             buf->allocations = tmp;
         }
 
+		//如果分配空间小于最小定义空间则分配最小的定义空间，大于则使用实际申请分配的空间
         alloc_bytes = aligned_bytes < MQTT_MIN_EXTENT_SIZE ? MQTT_MIN_EXTENT_SIZE : aligned_bytes;
         chunk = (char*)malloc(alloc_bytes);
         if(NULL == chunk) {
